@@ -3,6 +3,8 @@ last_state = "x"
 only_play_on = [None, None]
 def func(cell:Button):
     global last_state, only_play_on
+    if grid_by_grid[cell.row][cell.col] !="":
+        return
     if last_state == "x":
         last_state = "o"
     else:
@@ -16,26 +18,45 @@ surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
 grids = [[ Button(surface, row*WIDTH/9, col*HEIGHT/9, WIDTH/9, HEIGHT/9, func, row, col) for col in range(9)] for row in range(9)]
 grid_by_grid = [["" for _ in range(9)] for _ in range(9)]
+bigger_grid = [["" for _ in range(3)] for _ in range(3)]
+bigger_grid_buttons = [[Button(surface, row*WIDTH/3, col*HEIGHT/3, WIDTH/3, HEIGHT/3, func, row, col, 150) for row in range(3)] for col in range(3)]
 while True:
     pygame.display.update()
-    surface.fill((0,0,0))
+    surface.fill((255,255,255))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-
+    empty_cells = 0
     for row in range(9):
         for col in range(9):
-            print((row//3 , only_play_on[0] , col//3 , only_play_on[1]))
-            grids[row][col].update(grid_by_grid[row][col])
-            if (row//3 == only_play_on[0] and col//3 == only_play_on[1]):
+            if (row//3 == only_play_on[0] and col//3 == only_play_on[1]) and bigger_grid[row//3][col//3]=="":
                 grids[row][col].disabled = False
+                if grid_by_grid[row][col] =="":
+                    empty_cells +=1
             else:
                 grids[row][col].disabled = True
+
             if only_play_on[0] is None:
                 grids[row][col].disabled = False
+                if grid_by_grid[row][col] =="":
+                    empty_cells +=1
+
+            if bigger_grid[row//3][col//3]=="":
+                grids[row][col].update(grid_by_grid[row][col])
+
+            elif bigger_grid[row//3][col//3]=="x" or bigger_grid[row//3][col//3]=="o":
+                bigger_grid_buttons[row//3][col//3].update(bigger_grid[row//3][col//3])
+
+
+    if empty_cells==0:
+        print(empty_cells)       
+        only_play_on = [None, None]
     
     for row in range(0,WIDTH+1,WIDTH//3):
         for col in range(0,HEIGHT+1,HEIGHT//3):
             pygame.draw.line(surface,BORDER_COLOR,(0,col),(WIDTH,col), 5)
             pygame.draw.line(surface,BORDER_COLOR,(row,0),(row,HEIGHT), 5)
+    
+    bigger_grid = get_new_bigger_grid(grid_by_grid)
+    print(bigger_grid)

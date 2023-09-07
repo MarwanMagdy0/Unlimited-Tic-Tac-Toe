@@ -26,7 +26,7 @@ class Mouse:
 mouse = Mouse()
 
 class Button:
-    def __init__(self, surface, x, y, w, h, command, row, col):
+    def __init__(self, surface, x, y, w, h, command, row, col, font_size=50):
         self.surface = surface
         self.x = x
         self.y = y
@@ -34,9 +34,9 @@ class Button:
         self.h = h
         self.row = row
         self.col = col
-        self.font = pygame.font.SysFont("HELVETICA",50)
         self.disabled = False
         self.command = command
+        self.font = pygame.font.SysFont("HELVETICA",font_size)
 
     def update(self, char):
         x,y = pygame.mouse.get_pos()
@@ -53,3 +53,38 @@ class Button:
         pygame.draw.rect(self.surface, color, (self.x, self.y, self.w, self.h))
         pygame.draw.rect(self.surface, BORDER_COLOR, (self.x, self.y, self.w, self.h), 1)
         self.surface.blit(text,coor)
+
+
+def get_game_state(grid):
+    for row in range(3):
+        if grid[row][0] == grid[row][1] and grid[row][0] == grid[row][2]:
+            return grid[row][0]
+    
+    for col in range(3):
+        if grid[0][col] == grid[1][col] and grid[1][col] == grid[2][col]:
+            return grid[0][col]
+    
+    if grid[0][0] == grid[1][1] and grid[0][0]==grid[2][2]:
+        return grid[0][0]
+    if grid[0][2] == grid[1][1] and grid[0][2] == grid[2][0]:
+        return grid[0][2]
+
+    for row in range(3):
+        for col in range(3):
+            if grid[row][col]=="":
+                return ""
+
+def get_new_bigger_grid(all_grids):
+    all_grids = np.array(all_grids)
+    output = [["" for _ in range(3)] for _ in range(3)]
+    for row in range(0,9,3):
+        for col in range(0,9,3):
+            output[row//3][col//3] = get_game_state(all_grids[row:row+3, col:col+3])
+    return output
+
+if __name__ == "__main__":
+    grids = [[ f"{row}{col}" for col in range(9)] for row in range(9)]
+    for grid in grids:
+        print(grid)
+    print()
+    print(get_new_bigger_grid(grids))

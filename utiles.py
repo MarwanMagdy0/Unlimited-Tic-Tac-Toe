@@ -57,34 +57,51 @@ class Button:
 
 def get_game_state(grid):
     for row in range(3):
-        if grid[row][0] == grid[row][1] and grid[row][0] == grid[row][2]:
+        if grid[row][0] == grid[row][1] and grid[row][0] == grid[row][2] and grid[row][0] != "":
             return grid[row][0]
     
     for col in range(3):
-        if grid[0][col] == grid[1][col] and grid[1][col] == grid[2][col]:
+        if grid[0][col] == grid[1][col] and grid[0][col] == grid[2][col] and grid[0][col] != "":
             return grid[0][col]
     
-    if grid[0][0] == grid[1][1] and grid[0][0]==grid[2][2]:
+    if grid[0][0] == grid[1][1] and grid[0][0]==grid[2][2] and grid[0][0] != "":
         return grid[0][0]
-    if grid[0][2] == grid[1][1] and grid[0][2] == grid[2][0]:
+    if grid[0][2] == grid[1][1] and grid[0][2] == grid[2][0] and grid[0][2] != "":
         return grid[0][2]
 
-    for row in range(3):
-        for col in range(3):
-            if grid[row][col]=="":
-                return ""
+    return ""
 
 def get_new_bigger_grid(all_grids):
     all_grids = np.array(all_grids)
     output = [["" for _ in range(3)] for _ in range(3)]
-    for row in range(0,9,3):
-        for col in range(0,9,3):
-            output[row//3][col//3] = get_game_state(all_grids[row:row+3, col:col+3])
+    output[0][0] = get_game_state(all_grids[0:3, 0:3])
+    output[0][1] = get_game_state(all_grids[0:3, 3:6])
+    output[0][2] = get_game_state(all_grids[0:3, 6:9])
+
+    output[1][0] = get_game_state(all_grids[3:6, 0:3])
+    output[1][1] = get_game_state(all_grids[3:6, 3:6])
+    output[1][2] = get_game_state(all_grids[3:6, 6:9])
+    
+    output[2][0] = get_game_state(all_grids[6:9, 0:3])
+    output[2][1] = get_game_state(all_grids[6:9, 3:6])
+    output[2][2] = get_game_state(all_grids[6:9, 6:9])
     return output
 
 if __name__ == "__main__":
-    grids = [[ f"{row}{col}" for col in range(9)] for row in range(9)]
-    for grid in grids:
-        print(grid)
-    print()
+    
+    grids =[['.', '.', '.', '.', '.', '.', '.', '.', '.'], 
+            ['.', 'x', '.', 'x', 'x', 'o', '.', '.', '.'], 
+            ['.', 'o', 'o', '.', 'o', 'x', 'x', 'x', '.'], 
+            ['.', 'x', 'o', 'x', 'o', '.', 'x', 'o', '.'], 
+            ['o', 'x', 'o', 'o', 'o', 'o', 'x', '.', '.'], 
+            ['.', '.', '.', 'o', '.', '.', 'x', 'x', '.'], 
+            ['.', 'x', 'o', '.', 'o', '.', 'x', '.', '.'], 
+            ['.', 'x', '.', 'o', 'x', 'x', 'x', 'o', '.'], 
+            ['.', '.', 'o', 'o', '.', '.', '.', '.', '.']]
+
+    for row in range(9):
+        for col in range(9):
+            print(grids[row][col], end=" ")
+        print()
+
     print(get_new_bigger_grid(grids))
